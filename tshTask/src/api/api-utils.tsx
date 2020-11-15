@@ -1,12 +1,13 @@
 import {
   FetchProductsProps,
   FetchProductsResponse,
+  Product,
   PromiseResponseData,
 } from '../types';
 
 const axios = require('axios').default;
 
-const fetchProducts = async (
+const fetchAllProducts = async (
   props: FetchProductsProps,
 ): Promise<FetchProductsResponse> => {
   return axios
@@ -33,4 +34,20 @@ const fetchProducts = async (
     });
 };
 
-export {fetchProducts};
+const fetchProduct = async (id: number): Promise<Product> => {
+  return axios
+    .get(`https://join-tsh-api-staging.herokuapp.com/product/${id}`, {
+      headers: {
+        accept: 'application/json',
+      },
+    })
+    .then((res: PromiseResponseData) => {
+      return res.data;
+    })
+    .catch((err: Error) => {
+      //TODO add errro handling
+      console.log(err);
+    });
+};
+
+export {fetchAllProducts, fetchProduct};

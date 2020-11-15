@@ -1,18 +1,18 @@
-import {faStar as fullStar} from '@fortawesome/free-solid-svg-icons';
-import {faStar as emptyStar} from '@fortawesome/free-regular-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 import {colors} from '../styles/styles';
+
+const star = require('../assets/images/star.png');
+const emptyStar = require('../assets/images/star_border.png');
 
 type Star = {
   rating: boolean;
   index: number;
 };
 
-type Props = {
+interface Props {
   rating: number;
-};
+}
 
 export const ProductStars: React.FC<Props> = ({rating}) => {
   const stars: Star[] = [];
@@ -25,11 +25,13 @@ export const ProductStars: React.FC<Props> = ({rating}) => {
   return (
     <View style={styles.container}>
       {stars.map((item: Star) => (
-        <FontAwesomeIcon
-          icon={item.rating ? fullStar : emptyStar}
-          size={13}
-          color={colors.yellow}
-          style={styles.icon}
+        <Image
+          key={`key-${item.index}`}
+          source={item.rating ? star : emptyStar}
+          style={[
+            {tintColor: item.rating ? colors.yellow : colors.darkGrey},
+            styles.icon,
+          ]}
         />
       ))}
     </View>
@@ -43,6 +45,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    marginHorizontal: 5,
+    height: 20,
+    width: 20,
+    padding: 2,
+    marginRight: 10,
   },
 });

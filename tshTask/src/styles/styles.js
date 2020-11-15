@@ -7,6 +7,7 @@ export const colors = {
   whiteGrey: '#F0F1F5',
   lightGrey: '#E0E2EA',
   backgroundGrey: '#F2F2F2',
+  starGrey: '#B1B5C9',
   grey: '#B9BDCF',
   darkGrey: '#9194A5',
   black: '#1A1B1D',
@@ -43,6 +44,13 @@ export const globalStyle = StyleSheet.create({
     backgroundColor: colors.blue,
     borderRadius: 4,
   },
+  logButtonDisabled: {
+    paddingVertical: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.darkGrey,
+    borderRadius: 4,
+  },
   logButtonText: {
     color: 'white',
     fontSize: 16,
@@ -55,11 +63,13 @@ export const globalStyle = StyleSheet.create({
     fontSize: 18,
     fontFamily: fonts.normal.n600,
     textAlignVertical: 'center',
+    marginBottom: 8,
   },
   productDescription: {
     color: colors.darkGrey,
     fontSize: 14,
     fontFamily: fonts.normal.n600,
     textAlignVertical: 'center',
+    marginBottom: 24,
   },
 });
