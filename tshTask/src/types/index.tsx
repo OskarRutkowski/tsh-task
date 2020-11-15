@@ -36,21 +36,25 @@ export type Product = {
   active: boolean;
 };
 
+export type MetaData = {
+  totalItems: number;
+  itemCount: number;
+  itemsPerPage: string;
+  totalPages: number;
+  currentPage: string;
+};
+
+export type Links = {
+  first: string;
+  previous: string;
+  next: string;
+  last: string;
+};
+
 export type FetchProductsResponse = {
   items: Array<Product>;
-  meta: {
-    totalItems: number;
-    itemCount: number;
-    itemsPerPage: string;
-    totalPages: number;
-    currentPage: string;
-  };
-  links: {
-    first: string;
-    previous: string;
-    next: string;
-    last: string;
-  };
+  meta: MetaData;
+  links: Links;
 };
 
 export type PromiseResponseData = {
