@@ -57,6 +57,33 @@ export type FetchProductsResponse = {
   links: Links;
 };
 
-export type PromiseResponseData = {
+export type PromiseResponseDataProduct = {
   data: FetchProductsResponse;
+};
+
+export type LoginProps = {
+  username: string;
+  password: string;
+};
+
+export type LoginAccess = {
+  username: string;
+  expiresIn: string;
+  access_token: string;
+};
+
+export type User = {
+  id: number;
+  username: string;
+  avatar: string;
+};
+
+export type FetchUsersResponse = {
+  items: Array<User>;
+  meta: MetaData;
+  links: Links;
+};
+
+export type PromiseResponseDataUser = {
+  data: FetchUsersResponse;
 };

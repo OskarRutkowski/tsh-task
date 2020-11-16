@@ -1,3 +1,4 @@
+import {observer} from 'mobx-react';
 import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
@@ -13,119 +14,141 @@ import {HeaderLogoLogin} from '../components/header-logo-login';
 import {ListFooter} from '../components/list-footer';
 import {ProductItem} from '../components/product-item';
 import {ProductItemEmpty} from '../components/product-item-empty';
+import {useStore} from '../mobx/use-store';
 import {colors} from '../styles/styles';
-import {Links, MetaData, Product} from '../types';
+import {
+  Links,
+  MetaData,
+  Product,
+  ScreenNavigationProp,
+  ScreenRouteProp,
+} from '../types';
 
 const barHeight = StatusBar.currentHeight;
 
-export const HomeScreen: React.FC = () => {
-  const [data, setData] = useState<Product[]>([]);
-  const [meta, setMeta] = useState<MetaData>({} as any);
-  const [links, setLinks] = useState<Links>({} as any);
-  const [searchFilter, setSearchFilter] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [isPromo, setIsPromo] = useState<boolean>(false);
+export interface Props {
+  route: ScreenRouteProp<'Home'>;
+  navigation: ScreenNavigationProp<'Home'>;
+}
 
-  useEffect(() => {
-    fetch({});
-  }, [searchFilter, isActive, isPromo]);
+export const HomeScreen: React.FC<Props> = observer(
+  ({route, navigation}: Props) => {
+    const [data, setData] = useState<Product[]>([]);
+    const [meta, setMeta] = useState<MetaData>({} as any);
+    const [links, setLinks] = useState<Links>({} as any);
+    const [searchFilter, setSearchFilter] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isActive, setIsActive] = useState<boolean>(false);
+    const [isPromo, setIsPromo] = useState<boolean>(false);
+    const LoggingStore = useStore().loggingStore;
+    const UserStore = useStore().userStore;
 
-  const fetch = async ({limit, page}: {limit?: number; page?: number}) => {
-    setIsLoading(true);
-    const result = await fetchAllProducts({
-      search: searchFilter,
-      limit: limit,
-      page: page,
-      promo: isPromo,
-      active: isActive,
-    });
-    setData(result.items);
-    setMeta(result.meta);
-    setLinks(result.links);
-    setIsLoading(false);
-  };
+    UserStore.fetchUserData(LoggingStore.userName);
 
-  const setPage = async (value: number) => {
-    console.log('SETPAGE', value);
-    fetch({limit: 10, page: value});
-  };
+    useEffect(() => {
+      fetch({});
+    }, [searchFilter, isActive, isPromo]);
 
-  const renderItem = ({item}: {item: Product}) => (
-    // <View />
-    <ProductItem key={`key-${item.id}`} item={item} />
-  );
+    const fetch = async ({limit, page}: {limit?: number; page?: number}) => {
+      setIsLoading(true);
+      const result = await fetchAllProducts({
+        search: searchFilter,
+        limit: limit,
+        page: page,
+        promo: isPromo,
+        active: isActive,
+      });
+      setData(result.items);
+      setMeta(result.meta);
+      setLinks(result.links);
+      setIsLoading(false);
+    };
 
-  const renderFooter = () => {
-    return (
-      <ListFooter
-        meta={meta}
-        links={links}
-        setPage={(value) => setPage(value)}
-      />
+    const setPage = async (value: number) => {
+      console.log('SETPAGE', value);
+      fetch({limit: 10, page: value});
+    };
+
+    const renderItem = ({item}: {item: Product}) => (
+      // <View />
+      <ProductItem key={`key-${item.id}`} item={item} />
     );
-  };
 
-  const renderEmpty = () => <ProductItemEmpty />;
+    const renderFooter = () => {
+      return (
+        <ListFooter
+          meta={meta}
+          links={links}
+          setPage={(value) => setPage(value)}
+        />
+      );
+    };
 
-  const renderHeader = () => (
-    <View style={styles.headerContainer}>
-      <View style={styles.headerLogoLoginCon}>
-        <HeaderLogoLogin />
-      </View>
-      <View style={styles.headerInputCon}>
-        <HeaderInput
-          searchFilter={searchFilter}
-          setSearchFilter={(value) => setSearchFilter(value)}
-        />
-      </View>
-      <View style={styles.filterContainer}>
-        <HeaderFilter
-          name="Active"
-          stateValue={isActive}
-          setStateValue={(value: boolean) => setIsActive(value)}
-        />
-        <HeaderFilter
-          name="Promo"
-          stateValue={isPromo}
-          setStateValue={(value: boolean) => setIsPromo(value)}
-        />
-      </View>
-    </View>
-  );
+    const renderEmpty = () => <ProductItemEmpty />;
 
-  const renderList = () =>
-    isLoading ? (
-      <View
-        style={{
-          flex: 0.7,
-          backgroundColor: colors.backgroundGrey,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <ActivityIndicator size={56} color={colors.blue} />
-      </View>
-    ) : (
-      <View style={{flex: 0.7}}>
-        <View style={{flex: 1, backgroundColor: colors.backgroundGrey}}>
-          <FlatList
-            data={data}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderItem}
-            ListFooterComponent={data.length !== 0 ? renderFooter : null}
-            ListEmptyComponent={renderEmpty}
+    const renderHeader = () => (
+      <View style={styles.headerContainer}>
+        <View style={styles.headerLogoLoginCon}>
+          <HeaderLogoLogin
+            navigation={navigation}
+            logOut={() => LoggingStore.logOut}
+            userData={UserStore.userData}
+          />
+        </View>
+        <View style={styles.headerInputCon}>
+          <HeaderInput
+            searchFilter={searchFilter}
+            setSearchFilter={(value) => setSearchFilter(value)}
+          />
+        </View>
+        <View style={styles.filterContainer}>
+          <HeaderFilter
+            name="Active"
+            stateValue={isActive}
+            setStateValue={(value: boolean) => setIsActive(value)}
+          />
+          <HeaderFilter
+            name="Promo"
+            stateValue={isPromo}
+            setStateValue={(value: boolean) => setIsPromo(value)}
           />
         </View>
       </View>
     );
 
-  return (
-    <View style={styles.container}>
-      {renderHeader()}
-      {renderList()}
-    </View>
-  );
-};
+    const renderList = () =>
+      isLoading ? (
+        <View
+          style={{
+            flex: 0.7,
+            backgroundColor: colors.backgroundGrey,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size={56} color={colors.blue} />
+        </View>
+      ) : (
+        <View style={{flex: 0.7}}>
+          <View style={{flex: 1, backgroundColor: colors.backgroundGrey}}>
+            <FlatList
+              data={data}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={renderItem}
+              ListFooterComponent={data.length !== 0 ? renderFooter : null}
+              ListEmptyComponent={renderEmpty}
+            />
+          </View>
+        </View>
+      );
+
+    return (
+      <View style={styles.container}>
+        {renderHeader()}
+        {renderList()}
+      </View>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {
