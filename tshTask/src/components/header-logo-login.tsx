@@ -79,8 +79,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imageContainer: {
-    height: 48,
-    width: 48,
+    height: 46,
+    width: 46,
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',

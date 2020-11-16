@@ -6,9 +6,11 @@ export class LoggingStore {
   @observable token: string = '';
   @observable loading: boolean = false;
   @observable userName: User['username'] = '';
+  @observable error: string = '';
 
   @action
   logIn = async ({username, password}: LoginProps) => {
+    this.error = '';
     this.loading = true;
     try {
       const loginRes: LoginAccess = await userLogin({username, password});
@@ -19,12 +21,18 @@ export class LoggingStore {
       this.token = '';
       this.userName = '';
       this.loading = false;
+      this.error = err.message;
     }
   };
 
   @action
   logOut = () => {
     this.token = '';
+  };
+
+  @action
+  setError = (value: string) => {
+    this.error = value;
   };
 
   @computed
