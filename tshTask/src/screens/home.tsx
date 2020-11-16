@@ -1,52 +1,42 @@
 import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
-  TouchableOpacity,
   StatusBar,
-  Image,
   ActivityIndicator,
-  ScrollView,
   FlatList,
 } from 'react-native';
 import {fetchAllProducts} from '../api/api-utils';
 import {HeaderFilter} from '../components/header-filter';
+import {HeaderInput} from '../components/header-input';
+import {HeaderLogoLogin} from '../components/header-logo-login';
 import {ListFooter} from '../components/list-footer';
 import {ProductItem} from '../components/product-item';
 import {ProductItemEmpty} from '../components/product-item-empty';
-import {colors, fonts, globalStyle} from '../styles/styles';
+import {colors} from '../styles/styles';
 import {Links, MetaData, Product} from '../types';
 
 const barHeight = StatusBar.currentHeight;
-const checkIcon = require('../assets/images/check.png');
 
 export const HomeScreen: React.FC = () => {
   const [data, setData] = useState<Product[]>([]);
   const [meta, setMeta] = useState<MetaData>({} as any);
   const [links, setLinks] = useState<Links>({} as any);
+  const [searchFilter, setSearchFilter] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isPromo, setIsPromo] = useState<boolean>(false);
 
   useEffect(() => {
     fetch({});
-  }, [isActive, isPromo]);
+  }, [searchFilter, isActive, isPromo]);
 
-  const fetch = async ({
-    search: search,
-    limit,
-    page,
-  }: {
-    search?: string;
-    limit?: number;
-    page?: number;
-  }) => {
+  const fetch = async ({limit, page}: {limit?: number; page?: number}) => {
     setIsLoading(true);
     const result = await fetchAllProducts({
-      search: search,
-      limit: limit! | 10,
-      page: page! | 1,
+      search: searchFilter,
+      limit: limit,
+      page: page,
       promo: isPromo,
       active: isActive,
     });
@@ -57,10 +47,12 @@ export const HomeScreen: React.FC = () => {
   };
 
   const setPage = async (value: number) => {
+    console.log('SETPAGE', value);
     fetch({limit: 10, page: value});
   };
 
   const renderItem = ({item}: {item: Product}) => (
+    // <View />
     <ProductItem key={`key-${item.id}`} item={item} />
   );
 
@@ -77,14 +69,16 @@ export const HomeScreen: React.FC = () => {
   const renderEmpty = () => <ProductItemEmpty />;
 
   const renderHeader = () => (
-    <View style={{flex: 0.3, paddingTop: barHeight, marginHorizontal: 24}}>
-      <View style={{flex: 0.33}}>
-        <View style={{flex: 0.5}}>
-          <Text>join.tsh.io</Text>
-        </View>
-        <View style={{flex: 0.5}}></View>
+    <View style={styles.headerContainer}>
+      <View style={styles.headerLogoLoginCon}>
+        <HeaderLogoLogin />
       </View>
-      <View style={{flex: 0.33}}></View>
+      <View style={styles.headerInputCon}>
+        <HeaderInput
+          searchFilter={searchFilter}
+          setSearchFilter={(value) => setSearchFilter(value)}
+        />
+      </View>
       <View style={styles.filterContainer}>
         <HeaderFilter
           name="Active"
@@ -118,7 +112,7 @@ export const HomeScreen: React.FC = () => {
             data={data}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderItem}
-            ListFooterComponent={renderFooter}
+            ListFooterComponent={data.length !== 0 ? renderFooter : null}
             ListEmptyComponent={renderEmpty}
           />
         </View>
@@ -149,7 +143,20 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   filterContainer: {
-    flex: 0.33,
+    flex: 0.333,
     flexDirection: 'row',
+  },
+  headerContainer: {
+    flex: 0.3,
+    paddingTop: barHeight,
+    marginHorizontal: 24,
+  },
+  headerLogoLoginCon: {
+    flex: 0.333,
+    flexDirection: 'row',
+  },
+  headerInputCon: {
+    flex: 0.333,
+    justifyContent: 'center',
   },
 });
