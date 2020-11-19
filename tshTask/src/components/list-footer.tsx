@@ -1,22 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {
-  Button,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  StatusBar,
-  Image,
-  ActivityIndicator,
-  ScrollView,
-  FlatList,
-} from 'react-native';
-import {fetchAllProducts} from '../api/api-utils';
-import {ProductItem} from '../components/product-item';
-import {ProductItemEmpty} from '../components/product-item-empty';
-import {ProductStars} from '../components/product-star';
-import {colors, globalStyle} from '../styles/styles';
-import {Links, MetaData, Product} from '../types';
+import React from 'react';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {colors, fonts} from '../styles/styles';
+import {Links, MetaData} from '../types';
 
 interface Props {
   meta: MetaData;
@@ -25,87 +10,40 @@ interface Props {
 }
 
 export const ListFooter: React.FC<Props> = ({meta, links, setPage}: Props) => {
-  const pageItems = [];
+  let pageItems = [];
   const currentPageInt = parseInt(meta.currentPage, 10);
-  // TODO nie dziala do konca
+  const fillArray = (i: number, increase: number, last: number) => {
+    let arr = [];
+    for (let j = increase; j <= last; j++) {
+      arr.push({index: i + j, sign: (i + j).toString()});
+    }
+    return arr;
+  };
+
   for (let i = currentPageInt - 3; i <= currentPageInt + 3; i++) {
-    if (i + 3 === 1) {
-      pageItems.push({index: i + 3, sign: (i + 3).toString()});
-      pageItems.push({index: i + 4, sign: (i + 4).toString()});
-      pageItems.push({index: i + 5, sign: (i + 5).toString()});
-      pageItems.push({index: i + 6, sign: (i + 6).toString()});
-      pageItems.push({index: i + 7, sign: (i + 7).toString()});
-      pageItems.push({index: i + 8, sign: (i + 8).toString()});
+    if (i === -2) {
+      pageItems = fillArray(i, 3, 8);
       pageItems.push({index: i + 9, sign: '...'});
       break;
-    }
-    if (i + 3 === 2) {
-      pageItems.push({index: i + 2, sign: (i + 2).toString()});
-      pageItems.push({index: i + 3, sign: (i + 3).toString()});
-      pageItems.push({index: i + 4, sign: (i + 4).toString()});
-      pageItems.push({index: i + 5, sign: (i + 5).toString()});
-      pageItems.push({index: i + 6, sign: (i + 6).toString()});
-      pageItems.push({index: i + 7, sign: (i + 7).toString()});
+    } else if (i === -1) {
+      pageItems = fillArray(i, 2, 7);
       pageItems.push({index: i + 8, sign: '...'});
       break;
-    }
-    if (i + 3 === 3) {
-      pageItems.push({index: i + 1, sign: (i + 1).toString()});
-      pageItems.push({index: i + 2, sign: (i + 2).toString()});
-      pageItems.push({index: i + 3, sign: (i + 3).toString()});
-      pageItems.push({index: i + 4, sign: (i + 4).toString()});
-      pageItems.push({index: i + 5, sign: (i + 5).toString()});
-      pageItems.push({index: i + 6, sign: (i + 6).toString()});
+    } else if (i === 0) {
+      pageItems = fillArray(i, 1, 6);
       pageItems.push({index: i + 7, sign: '...'});
       break;
-    }
-    if (i + 3 === 4) {
-      pageItems.push({index: i, sign: i.toString()});
-      pageItems.push({index: i + 1, sign: (i + 1).toString()});
-      pageItems.push({index: i + 2, sign: (i + 2).toString()});
-      pageItems.push({index: i + 3, sign: (i + 3).toString()});
-      pageItems.push({index: i + 4, sign: (i + 4).toString()});
-      pageItems.push({index: i + 5, sign: (i + 5).toString()});
+    } else if (i === 1) {
+      pageItems = fillArray(i, 0, 5);
       pageItems.push({index: i + 6, sign: '...'});
       break;
-    }
-
-    // if (i === meta.totalPages) {
-    //   pageItems.push({index: i, sign: '...'});
-    //   pageItems.push({index: i, sign: (i - 5).toString()});
-    //   pageItems.push({index: i, sign: (i - 4).toString()});
-    //   pageItems.push({index: i, sign: (i - 3).toString()});
-    //   pageItems.push({index: i, sign: (i - 2).toString()});
-    //   pageItems.push({index: i, sign: (i - 1).toString()});
-    //   pageItems.push({index: i, sign: i.toString()});
-    //   break;
-    // }
-    // if (i === meta.totalPages - 1) {
-    //   pageItems.push({index: i, sign: '...'});
-    //   pageItems.push({index: i, sign: (i - 4).toString()});
-    //   pageItems.push({index: i, sign: (i - 3).toString()});
-    //   pageItems.push({index: i, sign: (i - 2).toString()});
-    //   pageItems.push({index: i, sign: (i - 1).toString()});
-    //   pageItems.push({index: i, sign: i.toString()});
-    //   pageItems.push({index: i, sign: (i + 1).toString()});
-    //   break;
-    // }
-    // if (i === meta.totalPages - 2) {
-    //   pageItems.push({index: i, sign: '...'});
-    //   pageItems.push({index: i, sign: (i - 3).toString()});
-    //   pageItems.push({index: i, sign: (i - 2).toString()});
-    //   pageItems.push({index: i, sign: (i - 1).toString()});
-    //   pageItems.push({index: i, sign: i.toString()});
-    //   pageItems.push({index: i, sign: (i + 1).toString()});
-    //   pageItems.push({index: i, sign: (i + 2).toString()});
-    //   break;
-    // }
-    if (i === currentPageInt - 3 || i === currentPageInt + 3) {
+    } else if (i === currentPageInt - 3 || i === currentPageInt + 3) {
       pageItems.push({index: i, sign: '...'});
     } else {
       pageItems.push({index: i, sign: i.toString()});
     }
   }
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -113,10 +51,8 @@ export const ListFooter: React.FC<Props> = ({meta, links, setPage}: Props) => {
         disabled={links.previous === ''}>
         <Text
           style={[
-            globalStyle.productName,
+            styles.first,
             {
-              fontSize: 14,
-              paddingRight: 24,
               color: links.previous === '' ? colors.darkGrey : colors.black,
             },
           ]}>
@@ -130,10 +66,8 @@ export const ListFooter: React.FC<Props> = ({meta, links, setPage}: Props) => {
           disabled={item.sign === '...'}>
           <Text
             style={[
-              globalStyle.productName,
+              styles.inside,
               {
-                fontSize: 14,
-                paddingHorizontal: 8,
                 color:
                   item.sign === meta.currentPage ? colors.blue : colors.black,
               },
@@ -148,10 +82,8 @@ export const ListFooter: React.FC<Props> = ({meta, links, setPage}: Props) => {
         disabled={links.next === ''}>
         <Text
           style={[
-            globalStyle.productName,
+            styles.last,
             {
-              fontSize: 14,
-              paddingLeft: 24,
               color: links.next === '' ? colors.darkGrey : colors.black,
             },
           ]}>
@@ -171,5 +103,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  first: {
+    color: colors.black,
+    fontFamily: fonts.normal.n600,
+    textAlignVertical: 'center',
+    marginBottom: 8,
+    fontSize: 14,
+    paddingRight: 24,
+  },
+  last: {
+    color: colors.black,
+    fontSize: 14,
+    paddingLeft: 24,
+    fontFamily: fonts.normal.n600,
+    textAlignVertical: 'center',
+    marginBottom: 8,
+  },
+  inside: {
+    color: colors.black,
+    fontSize: 14,
+    paddingHorizontal: 8,
+    fontFamily: fonts.normal.n600,
+    textAlignVertical: 'center',
+    marginBottom: 8,
   },
 });

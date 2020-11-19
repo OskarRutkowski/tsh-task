@@ -1,10 +1,11 @@
-import {action, observable} from 'mobx';
+import {action, computed, observable} from 'mobx';
 import {getUserInfo} from '../api/api-utils';
 import {User} from '../types';
 
 export class UserStore {
   @observable userData: User = {} as any;
   @observable loading: boolean = false;
+  @observable error: string = '';
 
   @action
   fetchUserData = async (userName: string) => {
@@ -14,8 +15,13 @@ export class UserStore {
       this.userData = userRes;
       this.loading = false;
     } catch (err) {
-      console.log(err);
       this.loading = false;
+      this.error = err;
     }
   };
+
+  @computed
+  get isError() {
+    return this.error !== '';
+  }
 }

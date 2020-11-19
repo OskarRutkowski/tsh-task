@@ -14,16 +14,6 @@ const axios = require('axios').default;
 const fetchAllProducts = async (
   props: FetchProductsProps,
 ): Promise<FetchProductsResponse> => {
-  console.log(
-    'API',
-    `https://join-tsh-api-staging.herokuapp.com/product?${
-      props.search ? 'search=' + props.search : ''
-    }${props.limit ? '&limit=' + props.limit : '&limit=10'}${
-      props.page ? '&page=' + props.page : '&page=1'
-    }${props.promo ? '&promo=' + props.promo : ''}${
-      props.active ? '&active=' + props.active : ''
-    }`,
-  );
   return axios
     .get(
       `https://join-tsh-api-staging.herokuapp.com/product?${
@@ -40,11 +30,10 @@ const fetchAllProducts = async (
       },
     )
     .then((res: PromiseResponseDataProduct) => {
-      return res.data;
+      return Promise.resolve(res.data);
     })
     .catch((err: Error) => {
-      //TODO add errro handling
-      console.log(err);
+      return Promise.reject(err.message);
     });
 };
 
@@ -56,11 +45,10 @@ const fetchProduct = async (id: number): Promise<Product> => {
       },
     })
     .then((res: PromiseResponseDataProduct) => {
-      return res.data;
+      return Promise.resolve(res.data);
     })
     .catch((err: Error) => {
-      //TODO add errro handling
-      console.log(err);
+      return Promise.reject(err.message);
     });
 };
 
@@ -74,12 +62,10 @@ const userLogin = async ({
       password: password,
     })
     .then((res: PromiseResponseDataUser) => {
-      console.log('RES LOGIN', res.data);
-      return res.data;
+      return Promise.resolve(res.data);
     })
     .catch((err: Error) => {
-      //TODO add errro handling
-      console.log(err);
+      return Promise.reject(err.message);
     });
 };
 
@@ -89,11 +75,10 @@ const getUserInfo = async (userName: string): Promise<User> => {
     .get(`https://join-tsh-api-staging.herokuapp.com/users`)
     .then(async (res: PromiseResponseDataUser) => {
       const user = res.data.items.find((item) => item.username === userName);
-      return user;
+      return Promise.resolve(user);
     })
     .catch((err: Error) => {
-      //TODO add errro handling
-      console.log(err);
+      return Promise.reject(err.message);
     });
 };
 export {fetchAllProducts, fetchProduct, userLogin, getUserInfo};

@@ -25,6 +25,8 @@ export const LoginScreen: React.FC<Props> = observer(
   ({route, navigation}: Props) => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
     const passwordInputRef = useRef<any>(null);
 
     const LoggingStore = useStore().loggingStore;
@@ -33,7 +35,7 @@ export const LoginScreen: React.FC<Props> = observer(
       passwordInputRef.current!.setNativeProps({
         style: {fontFamily: fonts.normal.n600},
       });
-    }, []);
+    }, [LoggingStore.error]);
 
     const logIn = async () => {
       await LoggingStore.logIn({username: username, password: password});
@@ -42,18 +44,20 @@ export const LoginScreen: React.FC<Props> = observer(
       }
     };
 
-    const checkCreds = () => {
-      if (username === '') {
-        LoggingStore.setError('Empty fields');
+    const checkCreds = async () => {
+      setIsLoading(true);
+      if (username === '' || password === '') {
+        await LoggingStore.setError('Empty fields');
       } else {
-        logIn();
+        await logIn();
       }
+      setIsLoading(false);
     };
-    console.log('err', LoggingStore.error);
+
     return (
       <View style={styles.container}>
         <StatusBar translucent backgroundColor="transparent" />
-        <View style={{marginHorizontal: 24, flex: 1, justifyContent: 'center'}}>
+        <View style={styles.innerCon}>
           <View style={styles.logoContainer}>
             <Text style={styles.logoText}>join.tsh.io</Text>
           </View>
@@ -67,6 +71,8 @@ export const LoginScreen: React.FC<Props> = observer(
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <TextInput
                     onChangeText={(text) => setUsername(text)}
+                    onFocus={() => LoggingStore.setError('')}
+                    onBlur={() => LoggingStore.setError('')}
                     value={username}
                     underlineColorAndroid="transparent"
                     placeholder="Enter username"
@@ -80,6 +86,8 @@ export const LoginScreen: React.FC<Props> = observer(
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <TextInput
                     onChangeText={(text) => setPassword(text)}
+                    onFocus={() => LoggingStore.setError('')}
+                    onBlur={() => LoggingStore.setError('')}
                     value={password}
                     underlineColorAndroid="transparent"
                     placeholder="Enter password"
@@ -93,8 +101,8 @@ export const LoginScreen: React.FC<Props> = observer(
               <TouchableOpacity
                 style={styles.logButton}
                 onPress={() => checkCreds()}
-                disabled={LoggingStore.loading}>
-                {LoggingStore.loading ? (
+                disabled={isLoading}>
+                {isLoading ? (
                   <ActivityIndicator
                     size={16}
                     color={colors.white}
@@ -107,7 +115,9 @@ export const LoginScreen: React.FC<Props> = observer(
               <TouchableOpacity style={styles.link}>
                 <Text style={styles.linkText}>Forgot password?</Text>
               </TouchableOpacity>
-              <Text style={styles.errorText}>{LoggingStore.error}</Text>
+              {LoggingStore.isError ? (
+                <Text style={styles.errorText}>{LoggingStore.error}</Text>
+              ) : null}
             </View>
           </ScrollView>
         </View>
@@ -120,6 +130,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
+    justifyContent: 'center',
+  },
+  innerCon: {
+    marginHorizontal: 24,
+    flex: 1,
     justifyContent: 'center',
   },
   logButton: {
@@ -189,7 +204,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     fontFamily: fonts.normal.n600,
-    color: colors.black,
+    color: colors.red,
     paddingBottom: 8,
     paddingTop: 22,
     textAlign: 'center',

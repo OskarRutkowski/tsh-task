@@ -4,25 +4,22 @@ import {LoginAccess, LoginProps, User} from '../types';
 
 export class LoggingStore {
   @observable token: string = '';
-  @observable loading: boolean = false;
   @observable userName: User['username'] = '';
   @observable error: string = '';
 
   @action
   logIn = async ({username, password}: LoginProps) => {
     this.error = '';
-    this.loading = true;
-    try {
-      const loginRes: LoginAccess = await userLogin({username, password});
-      this.token = loginRes.access_token;
-      this.userName = loginRes.username;
-      this.loading = false;
-    } catch (err) {
-      this.token = '';
-      this.userName = '';
-      this.loading = false;
-      this.error = err.message;
-    }
+    await userLogin({username, password})
+      .then((res: LoginAccess) => {
+        this.token = res.access_token;
+        this.userName = res.username;
+      })
+      .catch((err: Error) => {
+        this.token = '';
+        this.userName = '';
+        this.error = 'Bad credentials ' + '[ ' + err + ' ]';
+      });
   };
 
   @action
@@ -34,6 +31,11 @@ export class LoggingStore {
   setError = (value: string) => {
     this.error = value;
   };
+
+  @computed
+  get isError() {
+    return this.error !== '';
+  }
 
   @computed
   get isLoggedIn() {

@@ -43,10 +43,9 @@ export const HomeScreen: React.FC<Props> = observer(
     const LoggingStore = useStore().loggingStore;
     const UserStore = useStore().userStore;
 
-    UserStore.fetchUserData(LoggingStore.userName);
-
     useEffect(() => {
       fetch({});
+      UserStore.fetchUserData(LoggingStore.userName);
     }, [searchFilter, isActive, isPromo]);
 
     const fetch = async ({limit, page}: {limit?: number; page?: number}) => {
@@ -65,12 +64,10 @@ export const HomeScreen: React.FC<Props> = observer(
     };
 
     const setPage = async (value: number) => {
-      console.log('SETPAGE', value);
       fetch({limit: 10, page: value});
     };
 
     const renderItem = ({item}: {item: Product}) => (
-      // <View />
       <ProductItem key={`key-${item.id}`} item={item} />
     );
 
@@ -118,26 +115,18 @@ export const HomeScreen: React.FC<Props> = observer(
 
     const renderList = () =>
       isLoading ? (
-        <View
-          style={{
-            flex: 0.7,
-            backgroundColor: colors.backgroundGrey,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
+        <View style={styles.indicatorCon}>
           <ActivityIndicator size={56} color={colors.blue} />
         </View>
       ) : (
-        <View style={{flex: 0.7}}>
-          <View style={{flex: 1, backgroundColor: colors.backgroundGrey}}>
-            <FlatList
-              data={data}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={renderItem}
-              ListFooterComponent={data.length !== 0 ? renderFooter : null}
-              ListEmptyComponent={renderEmpty}
-            />
-          </View>
+        <View style={styles.flatlistCon}>
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderItem}
+            ListFooterComponent={data.length !== 0 ? renderFooter : null}
+            ListEmptyComponent={renderEmpty}
+          />
         </View>
       );
 
@@ -181,5 +170,15 @@ const styles = StyleSheet.create({
   headerInputCon: {
     flex: 0.333,
     justifyContent: 'center',
+  },
+  indicatorCon: {
+    flex: 0.7,
+    backgroundColor: colors.backgroundGrey,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  flatlistCon: {
+    flex: 0.7,
+    backgroundColor: colors.backgroundGrey,
   },
 });
