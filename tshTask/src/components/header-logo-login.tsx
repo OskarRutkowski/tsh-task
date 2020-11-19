@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
 import {colors, fonts} from '../styles/styles';
 import {ScreenNavigationProp, User} from '../types';
 
@@ -9,12 +16,14 @@ interface Props {
   navigation: ScreenNavigationProp<'Home'>;
   logOut: () => void;
   userData: User;
+  loading: boolean;
 }
 
 export const HeaderLogoLogin: React.FC<Props> = ({
   navigation,
   logOut,
   userData,
+  loading,
 }: Props) => {
   const [extended, setExtended] = useState<boolean>(false);
 
@@ -24,19 +33,30 @@ export const HeaderLogoLogin: React.FC<Props> = ({
         <Text style={styles.logoText}>join.tsh.io</Text>
       </View>
       <View style={styles.avatarContainer}>
-        <TouchableOpacity
-          style={styles.avatar}
-          onPress={() => {
-            setExtended(!extended);
-          }}>
-          {extended ? (
-            <View style={styles.imageContainer}>
-              <Image source={arrowIcon} style={styles.image} />
-            </View>
-          ) : (
-            <Image source={{uri: userData.avatar}} style={styles.imageAvatar} />
-          )}
-        </TouchableOpacity>
+        {loading ? (
+          <View style={styles.indicatorCon}>
+            <ActivityIndicator size={56} color={colors.blue} />
+          </View>
+        ) : (
+          <View style={{flex: 1, justifyContent: 'center'}}>
+            <TouchableOpacity
+              style={styles.avatar}
+              onPress={() => {
+                setExtended(!extended);
+              }}>
+              {extended ? (
+                <View style={styles.imageContainer}>
+                  <Image source={arrowIcon} style={styles.image} />
+                </View>
+              ) : (
+                <Image
+                  source={{uri: userData.avatar}}
+                  style={styles.imageAvatar}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
         {extended && (
           <TouchableOpacity
             style={styles.extendedContainer}
@@ -104,7 +124,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     position: 'absolute',
     right: 60,
-    zIndex: 100,
+    zIndex: 1000,
     borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.blue,
@@ -116,5 +136,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     fontFamily: fonts.normal.n600,
+  },
+  indicatorCon: {
+    flex: 1,
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

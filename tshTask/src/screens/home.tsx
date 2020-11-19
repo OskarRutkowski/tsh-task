@@ -38,6 +38,7 @@ export const HomeScreen: React.FC<Props> = observer(
     const [links, setLinks] = useState<Links>({} as any);
     const [searchFilter, setSearchFilter] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoadingUser, setIsLoadingUser] = useState<boolean>(false);
     const [isActive, setIsActive] = useState<boolean>(false);
     const [isPromo, setIsPromo] = useState<boolean>(false);
     const LoggingStore = useStore().loggingStore;
@@ -45,8 +46,14 @@ export const HomeScreen: React.FC<Props> = observer(
 
     useEffect(() => {
       fetch({});
-      UserStore.fetchUserData(LoggingStore.userName);
+      fetchUser();
     }, [searchFilter, isActive, isPromo]);
+
+    const fetchUser = async () => {
+      setIsLoadingUser(true);
+      await UserStore.fetchUserData(LoggingStore.userName);
+      setIsLoadingUser(false);
+    };
 
     const fetch = async ({limit, page}: {limit?: number; page?: number}) => {
       setIsLoading(true);
@@ -90,6 +97,7 @@ export const HomeScreen: React.FC<Props> = observer(
             navigation={navigation}
             logOut={() => LoggingStore.logOut}
             userData={UserStore.userData}
+            loading={isLoadingUser}
           />
         </View>
         <View style={styles.headerInputCon}>
@@ -129,7 +137,6 @@ export const HomeScreen: React.FC<Props> = observer(
           />
         </View>
       );
-
     return (
       <View style={styles.container}>
         {renderHeader()}
